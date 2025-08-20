@@ -1,40 +1,17 @@
 import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Bot,
-  Zap,
-  Shield,
-  DollarSign,
-  Phone,
-  Mail,
-  Rocket,
-  CheckCircle,
-  ChevronRight,
-  Linkedin,
-  Twitter,
-  Github,
-  Code2,
-  Database,
-  Headphones,
-  Cpu,
-  BarChart3,
-  Layers
+  Bot, Zap, Shield, DollarSign, Phone, Mail, Rocket, CheckCircle, ChevronRight,
+  Linkedin, Twitter, Github, Code2, Database, Headphones, Cpu, BarChart3, Layers
 } from "lucide-react";
 
 /**
- * easebot.ai – Single-file React site with hash routing + mega menu
- * Stack: React + Tailwind + Framer Motion + lucide-react
- * Design: Abstract black/blue/white with animated gradients (subtle sheen)
- * Pages: Home (/), About (/about), Contact (/contact)
+ * easebot.ai – React + Tailwind v4 + Framer Motion
+ * Pages: Home (/), About (/about), Contact (/contact) via hash routing (#/…)
  */
 
 // --- Tiny hash router helpers ---
-const routes = {
-  HOME: "/",
-  ABOUT: "/about",
-  CONTACT: "/contact",
-} as const;
-
+const routes = { HOME: "/", ABOUT: "/about", CONTACT: "/contact" } as const;
 type Route = typeof routes[keyof typeof routes];
 
 function getHashRoute(): Route {
@@ -44,234 +21,107 @@ function getHashRoute(): Route {
   if (path.startsWith(routes.CONTACT)) return routes.CONTACT;
   return routes.HOME;
 }
+function navTo(path: Route){ if (typeof window !== 'undefined') window.location.hash = path; }
 
-function navTo(path: Route){
-  if (typeof window !== 'undefined') window.location.hash = path;
-}
-
-// Classic links still used in footer
-const nav = [
-  { label: "Home", href: routes.HOME },
-  { label: "Services & Pricing", href: routes.HOME + "#pricing" },
-  { label: "About", href: routes.ABOUT },
-  { label: "Process", href: routes.HOME + "#process" },
-  { label: "FAQ", href: routes.HOME + "#faq" },
-  { label: "Contact", href: routes.CONTACT },
-];
-
-// Mega menu data (Nintex-style)
+// --- Nav data ---
 const mega = {
   solutions: {
     label: "Solutions",
     columns: [
-      {
-        title: "Customer Experience",
-        items: [
-          { label: "Support Automation", desc: "24/7 chat + ticket deflection", href: `#${routes.HOME}#services`, icon: Headphones },
-          { label: "Sales Outreach", desc: "AI SDR, lead qual & follow-ups", href: `#${routes.HOME}#services`, icon: Rocket },
-          { label: "Success & Onboarding", desc: "Guides, checklists, nudges", href: `#${routes.HOME}#services`, icon: CheckCircle },
-        ],
-      },
-      {
-        title: "Operations",
-        items: [
-          { label: "Back‑Office RPA", desc: "Invoices, AP/AR, HR ops", href: `#${routes.HOME}#services`, icon: Layers },
-          { label: "Agentic Workflows", desc: "Plan → act → verify loops", href: `#${routes.HOME}#services`, icon: Cpu },
-          { label: "Data & Integrations", desc: "ETL, APIs, warehouses", href: `#${routes.HOME}#services`, icon: Database },
-        ],
-      },
-      {
-        title: "Insights",
-        items: [
-          { label: "Analytics Dashboard", desc: "ROI, deflection, CSAT", href: `#${routes.HOME}#services`, icon: BarChart3 },
-          { label: "Quality Systems", desc: "Human-in-the-loop reviews", href: `#${routes.HOME}#process`, icon: Shield },
-        ],
-      },
+      { title: "Customer Experience", items: [
+        { label: "Support Automation", desc: "24/7 chat + ticket deflection", href: `#${routes.HOME}#services`, icon: Headphones },
+        { label: "Sales Outreach", desc: "AI SDR, lead qual & follow-ups", href: `#${routes.HOME}#services`, icon: Rocket },
+        { label: "Success & Onboarding", desc: "Guides, checklists, nudges", href: `#${routes.HOME}#services`, icon: CheckCircle },
+      ]},
+      { title: "Operations", items: [
+        { label: "Back-Office RPA", desc: "Invoices, AP/AR, HR ops", href: `#${routes.HOME}#services`, icon: Layers },
+        { label: "Agentic Workflows", desc: "Plan → act → verify loops", href: `#${routes.HOME}#services`, icon: Cpu },
+        { label: "Data & Integrations", desc: "ETL, APIs, warehouses", href: `#${routes.HOME}#services`, icon: Database },
+      ]},
+      { title: "Insights", items: [
+        { label: "Analytics Dashboard", desc: "ROI, deflection, CSAT", href: `#${routes.HOME}#services`, icon: BarChart3 },
+        { label: "Quality Systems", desc: "Human-in-the-loop reviews", href: `#${routes.HOME}#process`, icon: Shield },
+      ]},
     ],
   },
   products: {
     label: "Products",
     columns: [
-      {
-        title: "Platform",
-        items: [
-          { label: "Easebot Core", desc: "Model‑agnostic AI engine", href: `#${routes.HOME}#services`, icon: Bot },
-          { label: "Pre‑built Bots", desc: "Templates for common flows", href: `#${routes.HOME}#services`, icon: Zap },
-          { label: "API & Webhooks", desc: "Integrate your stack", href: `#${routes.HOME}#services`, icon: Code2 },
-        ],
-      },
-      {
-        title: "Compliance",
-        items: [
-          { label: "Security", desc: "SSO, RBAC, audit logs", href: `#${routes.HOME}#services`, icon: Shield },
-          { label: "Data Residency", desc: "US/EU options", href: `#${routes.HOME}#pricing`, icon: Shield },
-        ],
-      },
+      { title: "Platform", items: [
+        { label: "Easebot Core", desc: "Model-agnostic AI engine", href: `#${routes.HOME}#services`, icon: Bot },
+        { label: "Pre-built Bots", desc: "Templates for common flows", href: `#${routes.HOME}#services`, icon: Zap },
+        { label: "API & Webhooks", desc: "Integrate your stack", href: `#${routes.HOME}#services`, icon: Code2 },
+      ]},
+      { title: "Compliance", items: [
+        { label: "Security", desc: "SSO, RBAC, audit logs", href: `#${routes.HOME}#services`, icon: Shield },
+        { label: "Data Residency", desc: "US/EU options", href: `#${routes.HOME}#pricing`, icon: Shield },
+      ]},
     ],
   },
   resources: {
     label: "Resources",
     columns: [
-      {
-        title: "Learn",
-        items: [
-          { label: "Case Studies", desc: "Results from real teams", href: `#${routes.HOME}#results`, icon: CheckCircle },
-          { label: "FAQ", desc: "Common questions answered", href: `#${routes.HOME}#faq`, icon: ChevronRight },
-        ],
-      },
-      {
-        title: "Guides",
-        items: [
-          { label: "RAG Playbook", desc: "Blueprint for knowledge bots", href: `#${routes.HOME}#process`, icon: Layers },
-          { label: "Agent Safety", desc: "Guardrails that work", href: `#${routes.HOME}#process`, icon: Shield },
-        ],
-      },
+      { title: "Learn", items: [
+        { label: "Case Studies", desc: "Results from real teams", href: `#${routes.HOME}#results`, icon: CheckCircle },
+        { label: "FAQ", desc: "Common questions answered", href: `#${routes.HOME}#faq`, icon: ChevronRight },
+      ]},
+      { title: "Guides", items: [
+        { label: "RAG Playbook", desc: "Blueprint for knowledge bots", href: `#${routes.HOME}#process`, icon: Layers },
+        { label: "Agent Safety", desc: "Guardrails that work", href: `#${routes.HOME}#process`, icon: Shield },
+      ]},
     ],
   },
   company: {
     label: "Company",
     columns: [
-      {
-        title: "About",
-        items: [
-          { label: "About Easebot", desc: "Team & mission", href: `#${routes.ABOUT}` , icon: Bot },
-          { label: "Contact", desc: "Talk to a human", href: `#${routes.CONTACT}`, icon: Mail },
-        ],
-      },
-      {
-        title: "Careers",
-        items: [
-          { label: "Open Roles", desc: "We hire pragmatists", href: `#${routes.ABOUT}`, icon: Rocket },
-        ],
-      },
+      { title: "About", items: [
+        { label: "About Easebot", desc: "Team & mission", href: `#${routes.ABOUT}`, icon: Bot },
+        { label: "Contact", desc: "Talk to a human", href: `#${routes.CONTACT}`, icon: Mail },
+      ]},
+      { title: "Careers", items: [
+        { label: "Open Roles", desc: "We hire pragmatists", href: `#${routes.ABOUT}`, icon: Rocket },
+      ]},
     ],
   },
   pricing: { label: "Pricing", href: `#${routes.HOME}#pricing` },
 } as const;
 
 const services = [
-  {
-    title: "AI Chatbots & Assistants",
-    icon: Bot,
-    desc: "Custom GPT-style chat for support, sales, onboarding, and internal knowledge with tone and guardrails tuned to your brand.",
-    bullets: [
-      "24/7 omni‑channel (web, Slack, WhatsApp)",
-      "Retrieval-Augmented Generation (RAG)",
-      "Escalation to human in one click",
-    ],
-  },
-  {
-    title: "Workflow Automation",
-    icon: Layers,
-    desc: "Streamline repetitive tasks across CRM, ticketing, and back-office tools with no‑code triggers and AI steps.",
-    bullets: [
-      "Zapier/Make/Tray & custom nodes",
-      "Human-in-the-loop approvals",
-      "SLA & error monitoring",
-    ],
-  },
-  {
-    title: "Data & Integrations",
-    icon: Database,
-    desc: "Clean, sync, and route data between apps. Build resilient APIs and webhooks that your business can trust.",
-    bullets: [
-      "ETL to warehouses (Snowflake/BigQuery)",
-      "Webhook & API gateways",
-      "SOC2‑friendly observability",
-    ],
-  },
-  {
-    title: "Agentic Workforces",
-    icon: Cpu,
-    desc: "Deploy multi‑step agents that plan, act, and verify outcomes across emails, CRMs, and internal tools.",
-    bullets: [
-      "Function‑calling tools",
-      "Planning + self‑check loops",
-      "Safe action scopes",
-    ],
-  },
-  {
-    title: "Analytics & Reporting",
-    icon: BarChart3,
-    desc: "Measure ROI with dashboards and attribution so every automation is tied to real business impact.",
-    bullets: [
-      "AI quality & deflection metrics",
-      "Revenue and saved hours",
-      "A/B tests & cohorting",
-    ],
-  },
-  {
-    title: "Security & Compliance",
-    icon: Shield,
-    desc: "Enterprise‑grade practices to protect your data and customers from day one.",
-    bullets: [
-      "SSO, RBAC, audit logs",
-      "PII redaction & data residency",
-      "Vendor risk assessments",
-    ],
-  },
+  { title: "AI Chatbots & Assistants", icon: Bot, desc: "Custom GPT-style chat for support, sales, onboarding, and internal knowledge with tone and guardrails tuned to your brand.",
+    bullets: ["24/7 omni-channel (web, Slack, WhatsApp)", "Retrieval-Augmented Generation (RAG)", "Escalation to human in one click"] },
+  { title: "Workflow Automation", icon: Layers, desc: "Streamline repetitive tasks across CRM, ticketing, and back-office tools with no-code triggers and AI steps.",
+    bullets: ["Zapier/Make/Tray & custom nodes", "Human-in-the-loop approvals", "SLA & error monitoring"] },
+  { title: "Data & Integrations", icon: Database, desc: "Clean, sync, and route data between apps. Build resilient APIs and webhooks that your business can trust.",
+    bullets: ["ETL to warehouses (Snowflake/BigQuery)", "Webhook & API gateways", "SOC2-friendly observability"] },
+  { title: "Agentic Workforces", icon: Cpu, desc: "Deploy multi-step agents that plan, act, and verify outcomes across emails, CRMs, and internal tools.",
+    bullets: ["Function-calling tools", "Planning + self-check loops", "Safe action scopes"] },
+  { title: "Analytics & Reporting", icon: BarChart3, desc: "Measure ROI with dashboards and attribution so every automation is tied to real business impact.",
+    bullets: ["AI quality & deflection metrics", "Revenue and saved hours", "A/B tests & cohorting"] },
+  { title: "Security & Compliance", icon: Shield, desc: "Enterprise-grade practices to protect your data and customers from day one.",
+    bullets: ["SSO, RBAC, audit logs", "PII redaction & data residency", "Vendor risk assessments"] },
 ];
 
 const plans = [
-  {
-    name: "Growth",
-    price: "$999",
-    cadence: "/mo",
-    badge: "Popular",
-    features: [
-      "3 chatbots + 10 automations",
-      "Up to 25,000 messages/actions",
-      "Priority support (24h)",
-      "Advanced analytics & A/B",
-    ],
-    highlighted: true,
-    cta: "Scale with Ease",
-  },
-  {
-    name: "Business",
-    price: "$1,499",
-    cadence: "/mo",
-    badge: "Teams",
-    features: [
-      "Unlimited chatbots & automations",
-      "Up to 150,000 messages/actions",
-      "SLA support + phone",
-      "SSO, RBAC, audit logs",
-    ],
-    cta: "Talk to Sales",
-  },
-  {
-    name: "Enterprise",
-    price: "$1,999",
-    cadence: "/mo",
-    badge: "Security & scale",
-    features: [
-      "Custom SLAs & throughput",
-      "Dedicated VPC / on‑prem options",
-      "Data residency (US/EU)",
-      "Compliance support",
-    ],
-    cta: "Book a Demo",
-  },
+  { name: "Growth", price: "$999", cadence: "/mo", badge: "Popular", features: [
+      "3 chatbots + 10 automations","Up to 25,000 messages/actions","Priority support (24h)","Advanced analytics & A/B"],
+    highlighted: true, cta: "Scale with Ease" },
+  { name: "Business", price: "$1,499", cadence: "/mo", badge: "Teams", features: [
+      "Unlimited chatbots & automations","Up to 150,000 messages/actions","SLA support + phone","SSO, RBAC, audit logs"],
+    highlighted: false, cta: "Talk to Sales" },
+  { name: "Enterprise", price: "$1,999", cadence: "/mo", badge: "Security & scale", features: [
+      "Custom SLAs & throughput","Dedicated VPC / on-prem options","Data residency (US/EU)","Compliance support"],
+    highlighted: false, cta: "Book a Demo" },
 ];
 
 const faqs = [
-  {
-    q: "Which LLMs and tools do you support?",
-    a: "We’re model‑agnostic: OpenAI, Anthropic, Google, and open‑source models. We integrate with CRMs (HubSpot/Salesforce), help desks (Zendesk/Intercom), Slack/Teams, Google/Microsoft, Zapier/Make, and custom APIs.",
-  },
-  {
-    q: "How do you handle data privacy?",
-    a: "We minimize retention, encrypt data at rest and in transit, and can route traffic through your cloud. Optional PII redaction, access controls, and audit logging are available on Business and Enterprise.",
-  },
-  {
-    q: "What does onboarding look like?",
-    a: "Week 1 discovery & design, Week 2 build & connect, Week 3 launch & measure. We bring templates and playbooks so you see value fast.",
-  },
-  {
-    q: "How is ROI measured?",
-    a: "We track saved hours, resolution times, deflection rates, conversion lifts, and revenue influence in dashboards—plus A/B testing to validate impact.",
-  },
+  { q: "Which LLMs and tools do you support?",
+    a: "We’re model-agnostic: OpenAI, Anthropic, Google, and open-source models. We integrate with CRMs (HubSpot/Salesforce), help desks (Zendesk/Intercom), Slack/Teams, Google/Microsoft, Zapier/Make, and custom APIs." },
+  { q: "How do you handle data privacy?",
+    a: "We minimize retention, encrypt data at rest and in transit, and can route traffic through your cloud. Optional PII redaction, access controls, and audit logging are available on Business and Enterprise." },
+  { q: "What does onboarding look like?",
+    a: "Week 1 discovery & design, Week 2 build & connect, Week 3 launch & measure. We bring templates and playbooks so you see value fast." },
+  { q: "How is ROI measured?",
+    a: "We track saved hours, resolution times, deflection rates, conversion lifts, and revenue influence in dashboards—plus A/B testing to validate impact." },
 ];
 
 const steps = [
@@ -293,10 +143,7 @@ function SearchIcon(props:any){
 
 const gradientBg =
   "bg-[radial-gradient(1400px_900px_at_100%_-10%,rgba(59,130,246,0.25),transparent_70%),radial-gradient(1400px_900px_at_0%_10%,rgba(147,197,253,0.25),transparent_70%),linear-gradient(180deg,#01040d,#020617,#0f172a)]";
-
-// Animated glass class is applied via CSS below using .card
-const glass =
-  "card backdrop-blur-xl border border-white/10 shadow-[0_0_1px_rgba(255,255,255,0.25),0_8px_40px_rgba(2,132,199,0.25)]";
+const glass = "card backdrop-blur-xl border border-white/10 shadow-[0_0_1px_rgba(255,255,255,0.25),0_8px_40px_rgba(2,132,199,0.25)]";
 
 const fadeUp = {
   initial: { opacity: 0, y: 16 },
@@ -311,19 +158,19 @@ export default function EasebotSite() {
   const [navOpen, setNavOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<null | keyof typeof mega>(null);
   const year = useMemo(() => new Date().getFullYear(), []);
-// --- Hover intent to prevent menu flicker ---
-const [hoverTimer, setHoverTimer] = useState<number | null>(null);
-const openMenuNow = (k: keyof typeof mega) => {
-  if (hoverTimer) clearTimeout(hoverTimer);
-  setHoverTimer(null);
-  setOpenMenu(k);
-};
-const scheduleCloseMenu = () => {
-  if (hoverTimer) clearTimeout(hoverTimer);
-  const t = window.setTimeout(() => setOpenMenu(null), 150); // small delay avoids gaps flicker
-  setHoverTimer(t);
-};
 
+  // --- Hover intent to prevent menu flicker ---
+  const [hoverTimer, setHoverTimer] = useState<number | null>(null);
+  const openMenuNow = (k: keyof typeof mega) => {
+    if (hoverTimer) clearTimeout(hoverTimer);
+    setHoverTimer(null);
+    setOpenMenu(k);
+  };
+  const scheduleCloseMenu = () => {
+    if (hoverTimer) clearTimeout(hoverTimer);
+    const t = window.setTimeout(() => setOpenMenu(null), 150);
+    setHoverTimer(t);
+  };
 
   useEffect(() => {
     const onHash = () => { setRoute(getHashRoute()); setNavOpen(false); };
@@ -371,69 +218,53 @@ const scheduleCloseMenu = () => {
               <span className="font-semibold tracking-tight">easebot<span className="text-blue-400">.ai</span></span>
             </a>
 
-           {/* Desktop nav with mega menu */}
-<nav
-  className="hidden md:flex items-center gap-2 text-sm relative"
-  onMouseLeave={scheduleCloseMenu}
->
-  {(["solutions","products","resources","company"] as Array<keyof typeof mega>).map((key) => (
-    <div
-      key={key}
-      className="relative"
-      onMouseEnter={() => openMenuNow(key)}
-      onMouseLeave={scheduleCloseMenu}
-    >
-      <button className={`px-3 py-2 rounded-lg hover:bg-white/10 ${openMenu === key ? "text-blue-300" : ""}`}>
-        {mega[key].label}
-      </button>
-    </div>
-  ))}
-
-  <a href={`${mega.pricing.href}`} className="px-3 py-2 rounded-lg hover:bg-white/10">
-    {mega.pricing.label}
-  </a>
-
-  {/* Mega panel (shared) */}
-  <AnimatePresence>
-    {openMenu && (
-      <motion.div
-        onMouseEnter={() => {
-          if (hoverTimer) {
-            clearTimeout(hoverTimer);
-            setHoverTimer(null);
-          }
-        }}
-        onMouseLeave={scheduleCloseMenu}
-        initial={{ opacity: 0, y: -6 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        className={`absolute left-0 top-full mt-2 w-[900px] max-w-[90vw] ${glass} rounded-2xl p-6 grid grid-cols-3 gap-4`}
-      >
-        {mega[openMenu].columns.map((col) => (
-          <div key={col.title}>
-            <div className="text-xs uppercase tracking-wide text-white/60">{col.title}</div>
-            <ul className="mt-2 space-y-1">
-              {col.items.map((it) => (
-                <li key={it.label}>
-                  <a href={it.href} className="flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-white/10">
-                    <div className="h-8 w-8 rounded-md bg-white/10 grid place-items-center">
-                      <it.icon className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <div className="font-medium">{it.label}</div>
-                      <div className="text-xs text-white/60">{it.desc}</div>
-                    </div>
-                  </a>
-                </li>
+            {/* Desktop nav with mega menu */}
+            <nav
+              className="hidden md:flex items-center gap-2 text-sm relative"
+              onMouseLeave={scheduleCloseMenu}
+            >
+              {(["solutions","products","resources","company"] as Array<keyof typeof mega>).map((key)=> (
+                <div key={key} className="relative" onMouseEnter={()=>openMenuNow(key)} onMouseLeave={scheduleCloseMenu}>
+                  <button className={`px-3 py-2 rounded-lg hover:bg-white/10 ${openMenu===key ? 'text-blue-300' : ''}`}>
+                    {mega[key].label}
+                  </button>
+                </div>
               ))}
-            </ul>
-          </div>
-        ))}
-      </motion.div>
-    )}
-  </AnimatePresence>
-</nav>
+              <a href={`${mega.pricing.href}`} className="px-3 py-2 rounded-lg hover:bg-white/10">Pricing</a>
 
+              {/* Mega panel (shared) */}
+              <AnimatePresence>
+                {openMenu && (
+                  <motion.div
+                    onMouseEnter={()=>{ if (hoverTimer) { clearTimeout(hoverTimer); setHoverTimer(null); } }}
+                    onMouseLeave={scheduleCloseMenu}
+                    initial={{opacity:0, y:-6}}
+                    animate={{opacity:1, y:0}}
+                    exit={{opacity:0, y:-6}}
+                    className={`absolute left-0 top-full mt-2 w-[900px] max-w-[90vw] ${glass} rounded-2xl p-6 grid grid-cols-3 gap-4`}
+                  >
+                    {mega[openMenu].columns.map((col)=> (
+                      <div key={col.title}>
+                        <div className="text-xs uppercase tracking-wide text-white/60">{col.title}</div>
+                        <ul className="mt-2 space-y-1">
+                          {col.items.map((it)=> (
+                            <li key={it.label}>
+                              <a href={it.href} className="flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-white/10">
+                                <div className="h-8 w-8 rounded-md bg-white/10 grid place-items-center"><it.icon className="h-4 w-4"/></div>
+                                <div>
+                                  <div className="font-medium">{it.label}</div>
+                                  <div className="text-xs text-white/60">{it.desc}</div>
+                                </div>
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </nav>
 
             {/* Desktop CTAs */}
             <div className="hidden md:flex items-center gap-3">
@@ -481,7 +312,7 @@ const scheduleCloseMenu = () => {
                     </div>
                   </details>
                 ))}
-                <a href={`${mega.pricing.href}`} onClick={()=>setNavOpen(false)} className="block mt-2 rounded-lg px-3 py-2 text-sm bg-white/10 hover:bg-white/20">{mega.pricing.label}</a>
+                <a href={`${mega.pricing.href}`} onClick={()=>setNavOpen(false)} className="block mt-2 rounded-lg px-3 py-2 text-sm bg-white/10 hover:bg-white/20">Pricing</a>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   <a href={`#${routes.CONTACT}`} className="rounded-lg px-3 py-2 text-center text-sm bg-white/10 hover:bg-white/20">Book a demo</a>
                   <a href={`#${routes.HOME}#pricing`} className="rounded-lg px-3 py-2 text-center text-sm bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400">See pricing</a>
@@ -512,13 +343,13 @@ function Home({openFaq, setOpenFaq}:{openFaq:number|null, setOpenFaq:(n:number|n
           <div className="grid lg:grid-cols-12 gap-10 items-center">
             <motion.div {...fadeUp} className="lg:col-span-7">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-blue-200">
-                <Shield className="h-3.5 w-3.5" /> Enterprise‑minded. Startup‑fast.
+                <Shield className="h-3.5 w-3.5" /> Enterprise-minded. Startup-fast.
               </span>
               <h1 className="mt-4 text-4xl/tight md:text-5xl/tight lg:text-6xl/tight font-bold tracking-tight">
                 Automate work with <span className="bg-gradient-to-r from-white via-blue-200 to-blue-400 bg-clip-text text-transparent">AI agents</span> that deliver results.
               </h1>
               <p className="mt-4 text-white/70 max-w-2xl">
-                Easebot.ai designs, builds, and runs AI automations—so your team can focus on what matters. From chat to back‑office workflows, we ship measurable ROI in weeks, not months.
+                Easebot.ai designs, builds, and runs AI automations—so your team can focus on what matters. From chat to back-office workflows, we ship measurable ROI in weeks, not months.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a href={`#${routes.CONTACT}`} className="rounded-2xl px-5 py-3 font-semibold bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 transition-colors shadow-xl flex items-center gap-2">
@@ -529,9 +360,9 @@ function Home({openFaq, setOpenFaq}:{openFaq:number|null, setOpenFaq:(n:number|n
                 </a>
               </div>
               <div className="mt-8 flex items-center gap-6 text-xs text-white/60">
-                <span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-blue-300"/> SOC2‑aware</span>
-                <span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-blue-300"/> Human‑in‑the‑loop</span>
-                <span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-blue-300"/> ROI‑first</span>
+                <span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-blue-300"/> SOC2-aware</span>
+                <span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-blue-300"/> Human-in-the-loop</span>
+                <span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-blue-300"/> ROI-first</span>
               </div>
             </motion.div>
             <motion.div {...fadeUp} className="lg:col-span-5">
@@ -541,7 +372,7 @@ function Home({openFaq, setOpenFaq}:{openFaq:number|null, setOpenFaq:(n:number|n
         </div>
       </section>
 
-      {/* Clients / Logos */}
+      {/* Logos */}
       <section aria-label="logos" className="py-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className={`grid grid-cols-2 md:grid-cols-6 gap-6 items-center justify-items-center rounded-2xl p-6 ${glass}`}>
@@ -582,7 +413,7 @@ function Home({openFaq, setOpenFaq}:{openFaq:number|null, setOpenFaq:(n:number|n
       {/* Pricing */}
       <section id="pricing" className="pt-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <SectionHeader eyebrow="Fair market pricing" title="Simple, transparent plans" subtitle="Month‑to‑month. Cancel anytime. Usage beyond included message/action allotments billed at cost + 10%." />
+          <SectionHeader eyebrow="Fair market pricing" title="Simple, transparent plans" subtitle="Month-to-month. Cancel anytime. Usage beyond included message/action allotments billed at cost + 10%." />
           <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {plans.map((p) => (
               <motion.div key={p.name} {...fadeUp} className={`p-6 rounded-2xl flex flex-col ${glass} ${p.highlighted ? 'ring-2 ring-blue-400/60' : ''}`}>
@@ -607,7 +438,7 @@ function Home({openFaq, setOpenFaq}:{openFaq:number|null, setOpenFaq:(n:number|n
               </motion.div>
             ))}
           </div>
-          <p className="text-xs text-white/50 mt-4">Need a custom SOW or want to bring your cloud? We offer fixed‑bid projects and usage‑based pricing. Contact us below.</p>
+          <p className="text-xs text-white/50 mt-4">Need a custom SOW or want to bring your cloud? We offer fixed-bid projects and usage-based pricing. Contact us below.</p>
         </div>
       </section>
 
@@ -636,7 +467,7 @@ function Home({openFaq, setOpenFaq}:{openFaq:number|null, setOpenFaq:(n:number|n
           <div className="mt-8 grid md:grid-cols-3 gap-6">
             {[1,2,3].map((i) => (
               <motion.figure key={i} {...fadeUp} className={`p-6 rounded-2xl ${glass}`}>
-                <blockquote className="text-sm text-white/80">“Easebot automated our lead routing and SDR follow‑ups in two weeks. Response times dropped by 63% and pipeline increased 18%.”</blockquote>
+                <blockquote className="text-sm text-white/80">“Easebot automated our lead routing and SDR follow-ups in two weeks. Response times dropped by 63% and pipeline increased 18%.”</blockquote>
                 <figcaption className="mt-4 text-xs text-white/60">Alex P. • VP Growth, BluePeak</figcaption>
               </motion.figure>
             ))}
@@ -683,9 +514,9 @@ function AboutPage(){
             <h3 className="font-semibold">Our mission</h3>
             <p className="text-white/70 text-sm mt-2">Make AI useful for every operator by turning messy workflows into reliable automations. We believe good automation feels invisible—things just get easier.</p>
             <ul className="mt-4 space-y-2 text-sm text-white/70">
-              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Outcome‑driven roadmaps</li>
-              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Security‑minded delivery</li>
-              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Pragmatic, vendor‑agnostic advice</li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Outcome-driven roadmaps</li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Security-minded delivery</li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Pragmatic, vendor-agnostic advice</li>
             </ul>
           </motion.div>
           <motion.div {...fadeUp} className={`p-6 rounded-2xl ${glass} sheen`}>
@@ -731,7 +562,7 @@ function ContactPage(){
               <Field label="Name" id="name" placeholder="Jane Doe" required />
               <Field label="Work email" id="email" type="email" placeholder="jane@company.com" required />
               <Field label="Company" id="company" placeholder="Acme Inc." />
-              <Field label="Phone" id="phone" type="tel" placeholder="+1 (555) 000‑0000" />
+              <Field label="Phone" id="phone" type="tel" placeholder="+1 (555) 000-0000" />
               <div className="md:col-span-2">
                 <Field label="Project goals" id="message" placeholder="What do you want to automate?" textarea required />
               </div>
@@ -741,13 +572,13 @@ function ContactPage(){
               <button disabled={status==="loading"} type="submit" className="rounded-2xl px-5 py-3 font-semibold bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 transition-colors shadow-xl flex items-center gap-2">
                 <Rocket className="h-5 w-5" /> {status==="loading"?"Sending…":"Request proposal"}
               </button>
-              {status==="success" && <span className="text-sm text-emerald-300">Thanks! We\'ll be in touch shortly.</span>}
+              {status==="success" && <span className="text-sm text-emerald-300">Thanks! We&apos;ll be in touch shortly.</span>}
               {status==="error" && <span className="text-sm text-rose-300">Something went wrong. Please email <a className="underline" href="mailto:hello@easebot.ai">hello@easebot.ai</a>.</span>}
               <a href="mailto:hello@easebot.ai" className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white">
                 <Mail className="h-4 w-4"/> hello@easebot.ai
               </a>
               <a href="tel:+15550000000" className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white">
-                <Phone className="h-4 w-4"/> +1 (555) 000‑0000
+                <Phone className="h-4 w-4"/> +1 (555) 000-0000
               </a>
             </div>
           </motion.form>
@@ -829,80 +660,47 @@ function SectionHeader({ eyebrow, title, subtitle }:{eyebrow:string, title:strin
   );
 }
 
-function Field({ label, id, placeholder, type = 'text', textarea = false, required=false }:{label:string, id:string, placeholder?:string, type?:string, textarea?:boolean, required?:boolean}){
+function Field({ label, id, placeholder, type = 'text', textarea = false, required=false }:{
+  label:string, id:string, placeholder?:string, type?:string, textarea?:boolean, required?:boolean
+}){
   return (
     <label htmlFor={id} className="block text-sm">
       <span className="text-white/80">{label}</span>
       {textarea ? (
-        <textarea name={id} id={id} required={required} placeholder={placeholder} className="mt-2 w-full min-h-[120px] rounded-xl bg-white/10 border border-white/10 px-3 py-2 placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <textarea name={id} id={id} required={required} placeholder={placeholder}
+          className="mt-2 w-full min-h-[120px] rounded-xl bg-white/10 border border-white/10 px-3 py-2 placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
       ) : (
-        <input name={id} id={id} type={type} required={required} placeholder={placeholder} className="mt-2 w-full rounded-xl bg-white/10 border border-white/10 px-3 py-2 placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input name={id} id={id} type={type} required={required} placeholder={placeholder}
+          className="mt-2 w-full rounded-xl bg-white/10 border border-white/10 px-3 py-2 placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500" />
       )}
     </label>
   );
 }
 
+/* === Decorative bits === */
 function Decor(){
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      {/* large gradient glow */}
-      <div className="absolute -top-24 right-0 h-[50rem] w-[50rem] rounded-full blur-3xl opacity-20" style={{background: "radial-gradient(closest-side, rgba(59,130,246,0.45), rgba(2,6,23,0))"}}/>
-      <div className="absolute -bottom-32 -left-10 h-[40rem] w-[40rem] rounded-full blur-3xl opacity-20" style={{background: "radial-gradient(closest-side, rgba(125,211,252,0.35), rgba(2,6,23,0))"}}/>
-      {/* abstract SVG lines */}
-      <svg className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.12]" width="1400" height="900" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#60A5FA" />
-            <stop offset="100%" stopColor="#22D3EE" />
-          </linearGradient>
-        </defs>
-        <path d="M0 200 C 200 100, 400 300, 600 200 S 1000 100, 1200 200" stroke="url(#g1)" strokeWidth="2"/>
-        <path d="M0 500 C 250 400, 450 600, 650 500 S 1050 400, 1400 500" stroke="url(#g1)" strokeWidth="2"/>
-      </svg>
+    <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
+      <div className="absolute -top-24 -right-24 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/10 blur-3xl" />
+      <div className="absolute -bottom-24 -left-24 h-[520px] w-[520px] rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/10 blur-3xl" />
     </div>
   );
 }
 
 function HeroCard(){
   return (
-    <div className={`rounded-3xl p-6 md:p-8 ${glass} relative overflow-hidden`}>
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10" />
-      <div className="relative">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 grid place-items-center shadow-inner">
-            <Layers className="h-5 w-5"/>
-          </div>
-          <div>
-            <div className="text-sm text-white/80">Automation snapshot</div>
-            <div className="font-semibold">Sales pipeline</div>
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-          {[{k:"Leads routed",v:"1,245"},{k:"Follow‑ups",v:"7,412"},{k:"Meetings",v:"318"}].map((m)=>(
-            <div key={m.k} className={`rounded-xl p-4 ${glass}`}>
-              <div className="text-xs text-white/60">{m.k}</div>
-              <div className="text-xl font-semibold">{m.v}</div>
-            </div>
-          ))}
-        </div>
-        <div className={`mt-4 rounded-2xl p-4 ${glass}`}>
-          <div className="text-sm font-medium">Example playbook</div>
-          <ul className="mt-2 space-y-2 text-sm text-white/70">
-            {[
-              "Intake from web + Slack",
-              "AI qualifies & summarizes",
-              "Auto‑assigns owner in CRM",
-              "Schedules intro via email",
-            ].map((s)=>(
-              <li key={s} className="flex items-start gap-2"><Layers className="h-4 w-4 text-blue-300 mt-0.5"/> {s}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="mt-4 flex items-center gap-3 text-xs text-white/60">
-          <span className="inline-flex items-center gap-2"><Headphones className="h-4 w-4"/> Managed by Easebot</span>
-          <span className="inline-flex items-center gap-2"><Shield className="h-4 w-4"/> SSO + audit logs</span>
-        </div>
+    <div className={`p-6 rounded-2xl ${glass} sheen`}>
+      <div className="text-sm text-white/70">Plug-and-play building blocks</div>
+      <ul className="mt-3 space-y-2 text-sm text-white/80">
+        <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Chatbots: support, sales, onboarding</li>
+        <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Workflows: RPA + agent tools</li>
+        <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Integrations: CRMs, help desks, data</li>
+        <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Analytics: attribution & QA</li>
+      </ul>
+      <div className="mt-6 rounded-xl p-3 bg-white/5 border border-white/10 text-xs text-white/60">
+        <p>Security first: SSO, RBAC, audit logs, PII redaction, and data residency options.</p>
       </div>
     </div>
   );
 }
+

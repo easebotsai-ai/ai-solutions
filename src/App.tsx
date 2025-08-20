@@ -359,50 +359,68 @@ export default function EasebotSite() {
             </a>
 
             {/* Desktop nav with mega menu */}
-            <nav className="hidden md:flex items-center gap-2 text-sm relative">
-              {(["solutions","products","resources","company"] as Array<keyof typeof mega>).map((key)=> (
-                <div key={key} className="relative"
-                  onMouseEnter={()=>setOpenMenu(key)}
-                  onMouseLeave={()=>setOpenMenu((prev)=> prev===key? null : prev)}
-                >
-                  <button className={`px-3 py-2 rounded-lg hover:bg-white/10 ${openMenu===key ? 'text-blue-300' : ''}`}>{mega[key].label}</button>
-                </div>
-              ))}
-              <a href={`${mega.pricing.href}`} className="px-3 py-2 rounded-lg hover:bg-white/10">{mega.pricing.label}</a>
+<nav
+  className="hidden md:flex items-center gap-2 text-sm relative"
+  onMouseLeave={scheduleCloseMenu}
+>
+  {(["solutions","products","resources","company"] as Array<keyof typeof mega>).map((key) => (
+    <div
+      key={key}
+      className="relative"
+      onMouseEnter={() => openMenuNow(key)}
+      onMouseLeave={scheduleCloseMenu}
+    >
+      <button className={`px-3 py-2 rounded-lg hover:bg-white/10 ${openMenu === key ? "text-blue-300" : ""}`}>
+        {mega[key].label}
+      </button>
+    </div>
+  ))}
 
-              {/* Mega panel (shared) */}
-              <AnimatePresence>
-                {openMenu && (
-                  <motion.div
-                    onMouseEnter={()=>{/* keep open */}}
-                    onMouseLeave={()=>setOpenMenu(null)}
-                    initial={{opacity:0, y:-6}}
-                    animate={{opacity:1, y:0}}
-                    exit={{opacity:0, y:-6}}
-                    className={`absolute left-0 top-full mt-2 w-[900px] max-w-[90vw] ${glass} rounded-2xl p-6 grid grid-cols-3 gap-4`}
-                  >
-                    {mega[openMenu].columns.map((col)=> (
-                      <div key={col.title}>
-                        <div className="text-xs uppercase tracking-wide text-white/60">{col.title}</div>
-                        <ul className="mt-2 space-y-1">
-                          {col.items.map((it)=> (
-                            <li key={it.label}>
-                              <a href={it.href} className="flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-white/10">
-                                <div className="h-8 w-8 rounded-md bg-white/10 grid place-items-center"><it.icon className="h-4 w-4"/></div>
-                                <div>
-                                  <div className="font-medium">{it.label}</div>
-                                  <div className="text-xs text-white/60">{it.desc}</div>
-                                </div>
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </nav>
+  <a href={`${mega.pricing.href}`} className="px-3 py-2 rounded-lg hover:bg-white/10">
+    {mega.pricing.label}
+  </a>
+
+  {/* Mega panel (shared) */}
+  <AnimatePresence>
+    {openMenu && (
+      <motion.div
+        onMouseEnter={() => {
+          if (hoverTimer) {
+            clearTimeout(hoverTimer);
+            setHoverTimer(null);
+          }
+        }}
+        onMouseLeave={scheduleCloseMenu}
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+        className={`absolute left-0 top-full mt-2 w-[900px] max-w-[90vw] ${glass} rounded-2xl p-6 grid grid-cols-3 gap-4`}
+      >
+        {mega[openMenu].columns.map((col) => (
+          <div key={col.title}>
+            <div className="text-xs uppercase tracking-wide text-white/60">{col.title}</div>
+            <ul className="mt-2 space-y-1">
+              {col.items.map((it) => (
+                <li key={it.label}>
+                  <a href={it.href} className="flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-white/10">
+                    <div className="h-8 w-8 rounded-md bg-white/10 grid place-items-center">
+                      <it.icon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="font-medium">{it.label}</div>
+                      <div className="text-xs text-white/60">{it.desc}</div>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </motion.div>
+    )}
+  </AnimatePresence>
+</nav>
+
 
             {/* Desktop CTAs */}
             <div className="hidden md:flex items-center gap-3">

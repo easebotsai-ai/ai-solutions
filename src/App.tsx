@@ -7,7 +7,7 @@ import {
 
 /**
  * easebot.ai – React + Tailwind v4 + Framer Motion
- * Pages: Home (/), About (/about), Contact (/contact) via hash routing (#/…)
+ * Pages via hash routes: Home (#/), About (#/about), Contact (#/contact)
  */
 
 // --- Tiny hash router helpers ---
@@ -23,7 +23,7 @@ function getHashRoute(): Route {
 }
 function navTo(path: Route){ if (typeof window !== 'undefined') window.location.hash = path; }
 
-// --- Nav data ---
+// --- Nav data (mega menu) ---
 const mega = {
   solutions: {
     label: "Solutions",
@@ -87,41 +87,25 @@ const mega = {
 } as const;
 
 const services = [
-  { title: "AI Chatbots & Assistants", icon: Bot, desc: "Custom GPT-style chat for support, sales, onboarding, and internal knowledge with tone and guardrails tuned to your brand.",
-    bullets: ["24/7 omni-channel (web, Slack, WhatsApp)", "Retrieval-Augmented Generation (RAG)", "Escalation to human in one click"] },
-  { title: "Workflow Automation", icon: Layers, desc: "Streamline repetitive tasks across CRM, ticketing, and back-office tools with no-code triggers and AI steps.",
-    bullets: ["Zapier/Make/Tray & custom nodes", "Human-in-the-loop approvals", "SLA & error monitoring"] },
-  { title: "Data & Integrations", icon: Database, desc: "Clean, sync, and route data between apps. Build resilient APIs and webhooks that your business can trust.",
-    bullets: ["ETL to warehouses (Snowflake/BigQuery)", "Webhook & API gateways", "SOC2-friendly observability"] },
-  { title: "Agentic Workforces", icon: Cpu, desc: "Deploy multi-step agents that plan, act, and verify outcomes across emails, CRMs, and internal tools.",
-    bullets: ["Function-calling tools", "Planning + self-check loops", "Safe action scopes"] },
-  { title: "Analytics & Reporting", icon: BarChart3, desc: "Measure ROI with dashboards and attribution so every automation is tied to real business impact.",
-    bullets: ["AI quality & deflection metrics", "Revenue and saved hours", "A/B tests & cohorting"] },
-  { title: "Security & Compliance", icon: Shield, desc: "Enterprise-grade practices to protect your data and customers from day one.",
-    bullets: ["SSO, RBAC, audit logs", "PII redaction & data residency", "Vendor risk assessments"] },
+  { title: "AI Chatbots & Assistants", icon: Bot, desc: "Custom GPT-style chat for support, sales, onboarding, and internal knowledge with tone and guardrails tuned to your brand.", bullets: ["24/7 omni-channel (web, Slack, WhatsApp)","Retrieval-Augmented Generation (RAG)","Escalation to human in one click"] },
+  { title: "Workflow Automation", icon: Layers, desc: "Streamline repetitive tasks across CRM, ticketing, and back-office tools with no-code triggers and AI steps.", bullets: ["Zapier/Make/Tray & custom nodes","Human-in-the-loop approvals","SLA & error monitoring"] },
+  { title: "Data & Integrations", icon: Database, desc: "Clean, sync, and route data between apps. Build resilient APIs and webhooks that your business can trust.", bullets: ["ETL to warehouses (Snowflake/BigQuery)","Webhook & API gateways","SOC2-friendly observability"] },
+  { title: "Agentic Workforces", icon: Cpu, desc: "Deploy multi-step agents that plan, act, and verify outcomes across emails, CRMs, and internal tools.", bullets: ["Function-calling tools","Planning + self-check loops","Safe action scopes"] },
+  { title: "Analytics & Reporting", icon: BarChart3, desc: "Measure ROI with dashboards and attribution so every automation is tied to real business impact.", bullets: ["AI quality & deflection metrics","Revenue and saved hours","A/B tests & cohorting"] },
+  { title: "Security & Compliance", icon: Shield, desc: "Enterprise-grade practices to protect your data and customers from day one.", bullets: ["SSO, RBAC, audit logs","PII redaction & data residency","Vendor risk assessments"] },
 ];
 
 const plans = [
-  { name: "Growth", price: "$999", cadence: "/mo", badge: "Popular", features: [
-      "3 chatbots + 10 automations","Up to 25,000 messages/actions","Priority support (24h)","Advanced analytics & A/B"],
-    highlighted: true, cta: "Scale with Ease" },
-  { name: "Business", price: "$1,499", cadence: "/mo", badge: "Teams", features: [
-      "Unlimited chatbots & automations","Up to 150,000 messages/actions","SLA support + phone","SSO, RBAC, audit logs"],
-    highlighted: false, cta: "Talk to Sales" },
-  { name: "Enterprise", price: "$1,999", cadence: "/mo", badge: "Security & scale", features: [
-      "Custom SLAs & throughput","Dedicated VPC / on-prem options","Data residency (US/EU)","Compliance support"],
-    highlighted: false, cta: "Book a Demo" },
+  { name: "Growth", price: "$999", cadence: "/mo", badge: "Popular", features: ["3 chatbots + 10 automations","Up to 25,000 messages/actions","Priority support (24h)","Advanced analytics & A/B"], highlighted: true, cta: "Scale with Ease" },
+  { name: "Business", price: "$1,499", cadence: "/mo", badge: "Teams", features: ["Unlimited chatbots & automations","Up to 150,000 messages/actions","SLA support + phone","SSO, RBAC, audit logs"], highlighted: false, cta: "Talk to Sales" },
+  { name: "Enterprise", price: "$1,999", cadence: "/mo", badge: "Security & scale", features: ["Custom SLAs & throughput","Dedicated VPC / on-prem options","Data residency (US/EU)","Compliance support"], highlighted: false, cta: "Book a Demo" },
 ];
 
 const faqs = [
-  { q: "Which LLMs and tools do you support?",
-    a: "We’re model-agnostic: OpenAI, Anthropic, Google, and open-source models. We integrate with CRMs (HubSpot/Salesforce), help desks (Zendesk/Intercom), Slack/Teams, Google/Microsoft, Zapier/Make, and custom APIs." },
-  { q: "How do you handle data privacy?",
-    a: "We minimize retention, encrypt data at rest and in transit, and can route traffic through your cloud. Optional PII redaction, access controls, and audit logging are available on Business and Enterprise." },
-  { q: "What does onboarding look like?",
-    a: "Week 1 discovery & design, Week 2 build & connect, Week 3 launch & measure. We bring templates and playbooks so you see value fast." },
-  { q: "How is ROI measured?",
-    a: "We track saved hours, resolution times, deflection rates, conversion lifts, and revenue influence in dashboards—plus A/B testing to validate impact." },
+  { q: "Which LLMs and tools do you support?", a: "We’re model-agnostic: OpenAI, Anthropic, Google, and open-source models. We integrate with CRMs (HubSpot/Salesforce), help desks (Zendesk/Intercom), Slack/Teams, Google/Microsoft, Zapier/Make, and custom APIs." },
+  { q: "How do you handle data privacy?", a: "We minimize retention, encrypt data at rest and in transit, and can route traffic through your cloud. Optional PII redaction, access controls, and audit logging are available on Business and Enterprise." },
+  { q: "What does onboarding look like?", a: "Week 1 discovery & design, Week 2 build & connect, Week 3 launch & measure. We bring templates and playbooks so you see value fast." },
+  { q: "How is ROI measured?", a: "We track saved hours, resolution times, deflection rates, conversion lifts, and revenue influence in dashboards—plus A/B testing to validate impact." },
 ];
 
 const steps = [
@@ -143,7 +127,8 @@ function SearchIcon(props:any){
 
 const gradientBg =
   "bg-[radial-gradient(1400px_900px_at_100%_-10%,rgba(59,130,246,0.25),transparent_70%),radial-gradient(1400px_900px_at_0%_10%,rgba(147,197,253,0.25),transparent_70%),linear-gradient(180deg,#01040d,#020617,#0f172a)]";
-const glass = "card backdrop-blur-xl border border-white/10 shadow-[0_0_1px_rgba(255,255,255,0.25),0_8px_40px_rgba(2,132,199,0.25)]";
+const glass =
+  "card backdrop-blur-xl border border-white/10 shadow-[0_0_1px_rgba(255,255,255,0.25),0_8px_40px_rgba(2,132,199,0.25)]";
 
 const fadeUp = {
   initial: { opacity: 0, y: 16 },
@@ -168,7 +153,7 @@ export default function EasebotSite() {
   };
   const scheduleCloseMenu = () => {
     if (hoverTimer) clearTimeout(hoverTimer);
-    const t = window.setTimeout(() => setOpenMenu(null), 150);
+    const t = window.setTimeout(() => setOpenMenu(null), 150); // small delay avoids gaps flicker
     setHoverTimer(t);
   };
 
@@ -209,7 +194,7 @@ export default function EasebotSite() {
 
       {/* Header / Nav */}
       <header className="sticky top-0 z-50">
-        <div className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4`}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
           <div className={`flex items-center justify-between rounded-2xl px-4 py-3 md:px-6 ${glass} sheen`}>
             <a href={`#${routes.HOME}`} className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 grid place-items-center shadow-inner">
@@ -218,25 +203,31 @@ export default function EasebotSite() {
               <span className="font-semibold tracking-tight">easebot<span className="text-blue-400">.ai</span></span>
             </a>
 
-            {/* Desktop nav with mega menu */}
+            {/* Desktop nav with mega menu (fixed) */}
             <nav
               className="hidden md:flex items-center gap-2 text-sm relative"
               onMouseLeave={scheduleCloseMenu}
             >
               {(["solutions","products","resources","company"] as Array<keyof typeof mega>).map((key)=> (
-                <div key={key} className="relative" onMouseEnter={()=>openMenuNow(key)} onMouseLeave={scheduleCloseMenu}>
+                <div
+                  key={key}
+                  className="relative"
+                  onMouseEnter={() => openMenuNow(key)}
+                >
                   <button className={`px-3 py-2 rounded-lg hover:bg-white/10 ${openMenu===key ? 'text-blue-300' : ''}`}>
                     {mega[key].label}
                   </button>
                 </div>
               ))}
-              <a href={`${mega.pricing.href}`} className="px-3 py-2 rounded-lg hover:bg-white/10">Pricing</a>
+              <a href={`${mega.pricing.href}`} className="px-3 py-2 rounded-lg hover:bg-white/10">
+                {mega.pricing.label}
+              </a>
 
               {/* Mega panel (shared) */}
               <AnimatePresence>
                 {openMenu && (
                   <motion.div
-                    onMouseEnter={()=>{ if (hoverTimer) { clearTimeout(hoverTimer); setHoverTimer(null); } }}
+                    onMouseEnter={() => { if (hoverTimer) { clearTimeout(hoverTimer); setHoverTimer(null); } }}
                     onMouseLeave={scheduleCloseMenu}
                     initial={{opacity:0, y:-6}}
                     animate={{opacity:1, y:0}}
@@ -703,4 +694,3 @@ function HeroCard(){
     </div>
   );
 }
-

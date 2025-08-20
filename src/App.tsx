@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bot, Zap, Shield, DollarSign, Phone, Mail, Rocket, CheckCircle, ChevronRight,
@@ -8,6 +8,7 @@ import {
 /**
  * easebot.ai – React + Tailwind v4 + Framer Motion
  * Pages via hash routes: Home (#/), About (#/about), Contact (#/contact)
+ * Header behavior: **CLICK-TO-OPEN** dropdowns (no hover effects, no header resize)
  */
 
 // --- Tiny hash router helpers ---
@@ -87,12 +88,12 @@ const mega = {
 } as const;
 
 const services = [
-  { title: "AI Chatbots & Assistants", icon: Bot, desc: "Custom GPT-style chat for support, sales, onboarding, and internal knowledge with tone and guardrails tuned to your brand.", bullets: ["24/7 omni-channel (web, Slack, WhatsApp)","Retrieval-Augmented Generation (RAG)","Escalation to human in one click"] },
-  { title: "Workflow Automation", icon: Layers, desc: "Streamline repetitive tasks across CRM, ticketing, and back-office tools with no-code triggers and AI steps.", bullets: ["Zapier/Make/Tray & custom nodes","Human-in-the-loop approvals","SLA & error monitoring"] },
-  { title: "Data & Integrations", icon: Database, desc: "Clean, sync, and route data between apps. Build resilient APIs and webhooks that your business can trust.", bullets: ["ETL to warehouses (Snowflake/BigQuery)","Webhook & API gateways","SOC2-friendly observability"] },
-  { title: "Agentic Workforces", icon: Cpu, desc: "Deploy multi-step agents that plan, act, and verify outcomes across emails, CRMs, and internal tools.", bullets: ["Function-calling tools","Planning + self-check loops","Safe action scopes"] },
-  { title: "Analytics & Reporting", icon: BarChart3, desc: "Measure ROI with dashboards and attribution so every automation is tied to real business impact.", bullets: ["AI quality & deflection metrics","Revenue and saved hours","A/B tests & cohorting"] },
-  { title: "Security & Compliance", icon: Shield, desc: "Enterprise-grade practices to protect your data and customers from day one.", bullets: ["SSO, RBAC, audit logs","PII redaction & data residency","Vendor risk assessments"] },
+  { title: "AI Chatbots & Assistants", icon: Bot, desc: "Custom GPT-style chat for support, sales, onboarding, and internal knowledge with tone and guardrails tuned to your brand.", bullets: ["24/7 omni-channel (web, Slack, WhatsApp)", "Retrieval-Augmented Generation (RAG)", "Escalation to human in one click"] },
+  { title: "Workflow Automation", icon: Layers, desc: "Streamline repetitive tasks across CRM, ticketing, and back-office tools with no-code triggers and AI steps.", bullets: ["Zapier/Make/Tray & custom nodes", "Human-in-the-loop approvals", "SLA & error monitoring"] },
+  { title: "Data & Integrations", icon: Database, desc: "Clean, sync, and route data between apps. Build resilient APIs and webhooks that your business can trust.", bullets: ["ETL to warehouses (Snowflake/BigQuery)", "Webhook & API gateways", "SOC2-friendly observability"] },
+  { title: "Agentic Workforces", icon: Cpu, desc: "Deploy multi-step agents that plan, act, and verify outcomes across emails, CRMs, and internal tools.", bullets: ["Function-calling tools", "Planning + self-check loops", "Safe action scopes"] },
+  { title: "Analytics & Reporting", icon: BarChart3, desc: "Measure ROI with dashboards and attribution so every automation is tied to real business impact.", bullets: ["AI quality & deflection metrics", "Revenue and saved hours", "A/B tests & cohorting"] },
+  { title: "Security & Compliance", icon: Shield, desc: "Enterprise-grade practices to protect your data and customers from day one.", bullets: ["SSO, RBAC, audit logs", "PII redaction & data residency", "Vendor risk assessments"] },
 ];
 
 const plans = [
@@ -144,24 +145,27 @@ export default function EasebotSite() {
   const [openMenu, setOpenMenu] = useState<null | keyof typeof mega>(null);
   const year = useMemo(() => new Date().getFullYear(), []);
 
-  // --- Hover intent to prevent menu flicker ---
-  const [hoverTimer, setHoverTimer] = useState<number | null>(null);
-  const openMenuNow = (k: keyof typeof mega) => {
-    if (hoverTimer) clearTimeout(hoverTimer);
-    setHoverTimer(null);
-    setOpenMenu(k);
-  };
-  const scheduleCloseMenu = () => {
-    if (hoverTimer) clearTimeout(hoverTimer);
-    const t = window.setTimeout(() => setOpenMenu(null), 150); // small delay avoids gaps flicker
-    setHoverTimer(t);
-  };
+  // CLICK-ONLY MENU: close on outside click or ESC
+  const navRef = useRef<HTMLDivElement | null>(null);
+  const toggleMenu = (k: keyof typeof mega) => setOpenMenu(prev => prev === k ? null : k);
 
   useEffect(() => {
-    const onHash = () => { setRoute(getHashRoute()); setNavOpen(false); };
+    const onHash = () => { setRoute(getHashRoute()); setNavOpen(false); setOpenMenu(null); };
     window.addEventListener('hashchange', onHash);
     if (!window.location.hash) navTo(routes.HOME);
     return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  useEffect(() => {
+    function handleDocClick(e: MouseEvent){
+      if (!navRef.current) return;
+      const target = e.target as Node;
+      if (!navRef.current.contains(target)) setOpenMenu(null);
+    }
+    function onEsc(e: KeyboardEvent){ if (e.key === 'Escape') setOpenMenu(null); }
+    document.addEventListener('click', handleDocClick);
+    document.addEventListener('keydown', onEsc);
+    return () => { document.removeEventListener('click', handleDocClick); document.removeEventListener('keydown', onEsc); };
   }, []);
 
   return (
@@ -173,20 +177,12 @@ export default function EasebotSite() {
           --sheen-alpha: 0.06; /* increase for stronger sheen */
           --sheen-speed: 18s;  /* lower = faster */
         }
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .card { background: var(--card-grad); background-size: 200% 200%; animation: gradientShift 30s ease-in-out infinite; position: relative; overflow: hidden; }
         .card::after { content: ""; position: absolute; inset: 0; pointer-events:none; background: radial-gradient(600px 300px at 100% 0%, rgba(147,197,253,0.08), transparent 60%), radial-gradient(600px 300px at 0% 100%, rgba(59,130,246,0.08), transparent 60%); }
         .sheen { position: relative; overflow: hidden; }
         .sheen::before { content: ""; position: absolute; top: -120%; left: -60%; width: 220%; height: 340%; transform: rotate(18deg); background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,var(--sheen-alpha)) 50%, rgba(255,255,255,0) 100% ); animation: sheenMove var(--sheen-speed) linear infinite; }
-        @keyframes sheenMove {
-          0% { transform: translateX(-60%) rotate(18deg); }
-          50% { transform: translateX(0%) rotate(18deg); }
-          100% { transform: translateX(60%) rotate(18deg); }
-        }
+        @keyframes sheenMove { 0% { transform: translateX(-60%) rotate(18deg); } 50% { transform: translateX(0%) rotate(18deg); } 100% { transform: translateX(60%) rotate(18deg); } }
       `}</style>
 
       {/* Floating abstract blobs */}
@@ -203,63 +199,62 @@ export default function EasebotSite() {
               <span className="font-semibold tracking-tight">easebot<span className="text-blue-400">.ai</span></span>
             </a>
 
-            {/* Desktop nav with mega menu (fixed) */}
-            <nav
-              className="hidden md:flex items-center gap-2 text-sm relative"
-              onMouseLeave={scheduleCloseMenu}
-            >
+            {/* Desktop nav with CLICK-TO-OPEN dropdowns (no hover effects) */}
+            <nav ref={navRef} className="hidden md:flex items-center gap-2 text-sm relative">
               {(["solutions","products","resources","company"] as Array<keyof typeof mega>).map((key)=> (
-                <div
-                  key={key}
-                  className="relative"
-                  onMouseEnter={() => openMenuNow(key)}
-                >
-                  <button className={`px-3 py-2 rounded-lg hover:bg-white/10 ${openMenu===key ? 'text-blue-300' : ''}`}>
+                <div key={key} className="relative">
+                  <button
+                    type="button"
+                    aria-expanded={openMenu===key}
+                    aria-controls={`menu-${key}`}
+                    onClick={() => toggleMenu(key)}
+                    className={`px-3 h-10 flex items-center rounded-lg transition-colors ${openMenu===key ? 'text-blue-300' : ''}`}
+                  >
                     {mega[key].label}
+                    <ChevronRight className={`ml-1 h-4 w-4 transition-transform ${openMenu===key ? 'rotate-90' : ''}`}/>
                   </button>
+
+                  {/* Per-item dropdown panel (positioned under the header, no layout shift) */}
+                  <AnimatePresence>
+                    {openMenu===key && (
+                      <motion.div
+                        id={`menu-${key}`}
+                        initial={{opacity:0, y: -4}}
+                        animate={{opacity:1, y: 0}}
+                        exit={{opacity:0, y: -4}}
+                        className={`absolute left-0 top-full mt-2 w-[780px] max-w-[90vw] ${glass} rounded-2xl p-6 grid grid-cols-3 gap-4`}
+                      >
+                        {mega[key].columns.map((col)=> (
+                          <div key={col.title}>
+                            <div className="text-xs uppercase tracking-wide text-white/60">{col.title}</div>
+                            <ul className="mt-2 space-y-1">
+                              {col.items.map((it)=> (
+                                <li key={it.label}>
+                                  <a href={it.href} onClick={()=>setOpenMenu(null)} className="flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-white/10">
+                                    <div className="h-8 w-8 rounded-md bg-white/10 grid place-items-center"><it.icon className="h-4 w-4"/></div>
+                                    <div>
+                                      <div className="font-medium">{it.label}</div>
+                                      <div className="text-xs text-white/60">{it.desc}</div>
+                                    </div>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ))}
-              <a href={`${mega.pricing.href}`} className="px-3 py-2 rounded-lg hover:bg-white/10">
-                {mega.pricing.label}
-              </a>
 
-              {/* Mega panel (shared) */}
-              <AnimatePresence>
-                {openMenu && (
-                  <motion.div
-                    onMouseEnter={() => { if (hoverTimer) { clearTimeout(hoverTimer); setHoverTimer(null); } }}
-                    onMouseLeave={scheduleCloseMenu}
-                    initial={{opacity:0, y:-6}}
-                    animate={{opacity:1, y:0}}
-                    exit={{opacity:0, y:-6}}
-                    className={`absolute left-0 top-full mt-2 w-[900px] max-w-[90vw] ${glass} rounded-2xl p-6 grid grid-cols-3 gap-4`}
-                  >
-                    {mega[openMenu].columns.map((col)=> (
-                      <div key={col.title}>
-                        <div className="text-xs uppercase tracking-wide text-white/60">{col.title}</div>
-                        <ul className="mt-2 space-y-1">
-                          {col.items.map((it)=> (
-                            <li key={it.label}>
-                              <a href={it.href} className="flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-white/10">
-                                <div className="h-8 w-8 rounded-md bg-white/10 grid place-items-center"><it.icon className="h-4 w-4"/></div>
-                                <div>
-                                  <div className="font-medium">{it.label}</div>
-                                  <div className="text-xs text-white/60">{it.desc}</div>
-                                </div>
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* Simple link for Pricing */}
+              <a href={`${mega.pricing.href}`} className="px-3 h-10 flex items-center rounded-lg">{mega.pricing.label}</a>
             </nav>
 
             {/* Desktop CTAs */}
             <div className="hidden md:flex items-center gap-3">
-              <a href={`#${routes.CONTACT}`} className="rounded-xl px-4 py-2 text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors">Book a demo</a>
+              <a href={`#${routes.CONTACT}`} className="rounded-xl px-4 py-2 text-sm font-medium bg-white/10 transition-colors">Book a demo</a>
               <a href={`#${routes.HOME}#pricing`} className="rounded-xl px-4 py-2 text-sm font-medium bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 transition-colors shadow-lg">
                 See pricing
               </a>
@@ -681,7 +676,7 @@ function Decor(){
 function HeroCard(){
   return (
     <div className={`p-6 rounded-2xl ${glass} sheen`}>
-      <div className="text-sm text-white/70">Plug-and-play building blocks</div>
+      <div className="text-sm text_white/70">Plug-and-play building blocks</div>
       <ul className="mt-3 space-y-2 text-sm text-white/80">
         <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Chatbots: support, sales, onboarding</li>
         <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Workflows: RPA + agent tools</li>
@@ -694,3 +689,4 @@ function HeroCard(){
     </div>
   );
 }
+

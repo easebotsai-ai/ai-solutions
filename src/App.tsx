@@ -1,14 +1,14 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Bot, Zap, Shield, DollarSign, Phone, Mail, Rocket, CheckCircle, ChevronRight,
+  Bot, Zap, Shield, DollarSign, Phone, Mail, Rocket, CheckCircle, ChevronRight, ChevronDown,
   Linkedin, Twitter, Github, Code2, Database, Headphones, Cpu, BarChart3, Layers
 } from "lucide-react";
 
 /**
  * easebot.ai – React + Tailwind v4 + Framer Motion
  * Pages via hash routes: Home (#/), About (#/about), Contact (#/contact)
- * Header behavior: **CLICK-TO-OPEN** dropdowns (no hover effects, no header resize)
+ * Header behavior: **HOVER-TO-OPEN** dropdowns with down arrows. No header resize.
  */
 
 // --- Tiny hash router helpers ---
@@ -143,11 +143,20 @@ export default function EasebotSite() {
   const [route, setRoute] = useState<Route>(getHashRoute());
   const [navOpen, setNavOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<null | keyof typeof mega>(null);
+  const [hoverTimer, setHoverTimer] = useState<number | null>(null); // for hover-intent
   const year = useMemo(() => new Date().getFullYear(), []);
 
-  // CLICK-ONLY MENU: close on outside click or ESC
-  const navRef = useRef<HTMLDivElement | null>(null);
-  const toggleMenu = (k: keyof typeof mega) => setOpenMenu(prev => prev === k ? null : k);
+  // Hover helpers to avoid flicker and prevent header resizing
+  const openMenuNow = (k: keyof typeof mega) => {
+    if (hoverTimer) clearTimeout(hoverTimer);
+    setHoverTimer(null);
+    setOpenMenu(k);
+  };
+  const scheduleCloseMenu = () => {
+    if (hoverTimer) clearTimeout(hoverTimer);
+    const t = window.setTimeout(() => setOpenMenu(null), 120);
+    setHoverTimer(t);
+  };
 
   useEffect(() => {
     const onHash = () => { setRoute(getHashRoute()); setNavOpen(false); setOpenMenu(null); };
@@ -156,16 +165,11 @@ export default function EasebotSite() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
+  // Optional: close menus on ESC
   useEffect(() => {
-    function handleDocClick(e: MouseEvent){
-      if (!navRef.current) return;
-      const target = e.target as Node;
-      if (!navRef.current.contains(target)) setOpenMenu(null);
-    }
     function onEsc(e: KeyboardEvent){ if (e.key === 'Escape') setOpenMenu(null); }
-    document.addEventListener('click', handleDocClick);
     document.addEventListener('keydown', onEsc);
-    return () => { document.removeEventListener('click', handleDocClick); document.removeEventListener('keydown', onEsc); };
+    return () => document.removeEventListener('keydown', onEsc);
   }, []);
 
   return (
@@ -199,29 +203,37 @@ export default function EasebotSite() {
               <span className="font-semibold tracking-tight">easebot<span className="text-blue-400">.ai</span></span>
             </a>
 
-            {/* Desktop nav with CLICK-TO-OPEN dropdowns (no hover effects) */}
-            <nav ref={navRef} className="hidden md:flex items-center gap-2 text-sm relative">
+            {/* Desktop nav with HOVER-TO-OPEN dropdowns */}
+            <nav
+              className="hidden md:flex items-center gap-2 text-sm relative"
+              onMouseLeave={scheduleCloseMenu}
+            >
               {(["solutions","products","resources","company"] as Array<keyof typeof mega>).map((key)=> (
-                <div key={key} className="relative">
+                <div
+                  key={key}
+                  className="relative"
+                  onMouseEnter={() => openMenuNow(key)}
+                >
                   <button
                     type="button"
                     aria-expanded={openMenu===key}
                     aria-controls={`menu-${key}`}
-                    onClick={() => toggleMenu(key)}
-                    className={`px-3 h-10 flex items-center rounded-lg transition-colors ${openMenu===key ? 'text-blue-300' : ''}`}
+                    className={`px-3 h-10 flex items-center gap-1 rounded-lg hover:bg-white/10 transition-colors ${openMenu===key ? 'text-blue-300' : ''}`}
                   >
                     {mega[key].label}
-                    <ChevronRight className={`ml-1 h-4 w-4 transition-transform ${openMenu===key ? 'rotate-90' : ''}`}/>
+                    <ChevronDown className={`ml-0.5 h-4 w-4 transition-transform ${openMenu===key ? 'rotate-180' : ''}`}/>
                   </button>
 
-                  {/* Per-item dropdown panel (positioned under the header, no layout shift) */}
+                  {/* Dropdown panel (under the item, not side) */}
                   <AnimatePresence>
                     {openMenu===key && (
                       <motion.div
                         id={`menu-${key}`}
-                        initial={{opacity:0, y: -4}}
-                        animate={{opacity:1, y: 0}}
-                        exit={{opacity:0, y: -4}}
+                        onMouseEnter={() => { if (hoverTimer) { clearTimeout(hoverTimer); setHoverTimer(null); } }}
+                        onMouseLeave={scheduleCloseMenu}
+                        initial={{opacity:0, y:-6}}
+                        animate={{opacity:1, y:0}}
+                        exit={{opacity:0, y:-6}}
                         className={`absolute left-0 top-full mt-2 w-[780px] max-w-[90vw] ${glass} rounded-2xl p-6 grid grid-cols-3 gap-4`}
                       >
                         {mega[key].columns.map((col)=> (
@@ -230,7 +242,7 @@ export default function EasebotSite() {
                             <ul className="mt-2 space-y-1">
                               {col.items.map((it)=> (
                                 <li key={it.label}>
-                                  <a href={it.href} onClick={()=>setOpenMenu(null)} className="flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-white/10">
+                                  <a href={it.href} className="flex items-start gap-3 rounded-lg px-2 py-2 hover:bg-white/10">
                                     <div className="h-8 w-8 rounded-md bg-white/10 grid place-items-center"><it.icon className="h-4 w-4"/></div>
                                     <div>
                                       <div className="font-medium">{it.label}</div>
@@ -676,7 +688,7 @@ function Decor(){
 function HeroCard(){
   return (
     <div className={`p-6 rounded-2xl ${glass} sheen`}>
-      <div className="text-sm text_white/70">Plug-and-play building blocks</div>
+      <div className="text-sm text-white/70">Plug-and-play building blocks</div>
       <ul className="mt-3 space-y-2 text-sm text-white/80">
         <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Chatbots: support, sales, onboarding</li>
         <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-blue-300 mt-0.5"/> Workflows: RPA + agent tools</li>
@@ -689,4 +701,3 @@ function HeroCard(){
     </div>
   );
 }
-
